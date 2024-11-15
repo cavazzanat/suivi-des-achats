@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suivi des Achats</title>
     <style>
+        /* Styles généraux */
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
@@ -15,7 +16,6 @@
         }
         h1, h2 {
             color: #333;
-            text-align: center;
             margin-bottom: 10px;
         }
         .section {
@@ -24,8 +24,7 @@
             margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         label {
             display: block;
@@ -48,7 +47,8 @@
             margin-left: auto;
             margin-right: auto;
         }
-        .add-btn, .add-category-btn {
+        /* Boutons stylisés */
+        .button {
             background-color: #4CAF50;
             color: white;
             padding: 10px;
@@ -57,32 +57,15 @@
             cursor: pointer;
             width: 80%;
             font-size: 1em;
+            margin-top: 10px;
             display: block;
             margin-left: auto;
             margin-right: auto;
-            margin-top: 10px;
         }
-        .add-btn:hover, .add-category-btn:hover {
+        .button:hover {
             background-color: #45a049;
         }
-        .summary {
-            color: #333;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        .shopping-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .shopping-list li {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 8px;
-            margin: 8px 0;
-            background-color: #f3f3f3;
-            border-radius: 4px;
-        }
+        /* Pour les boutons de suppression */
         .remove-btn, .remove-category-btn {
             background-color: #FF6347;
             color: white;
@@ -95,12 +78,54 @@
         .remove-btn:hover, .remove-category-btn:hover {
             background-color: #FF4500;
         }
-        .category-list {
+        /* Récapitulatif */
+        .summary {
+            color: #333;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        /* Liste des achats */
+        .shopping-list {
             list-style-type: none;
             padding: 0;
-            display: inline-block;
-            text-align: left;
+        }
+        .shopping-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin: 8px 0;
+            background-color: #f3f3f3;
+            border-radius: 4px;
+        }
+        /* Liste de catégories */
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none;
+            padding: 0;
             margin: 0;
+            justify-content: center;
+        }
+        .category-item {
+            background-color: #e3e3e3;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+        /* Media Query pour écrans mobiles */
+        @media (max-width: 600px) {
+            input[type="text"],
+            input[type="number"],
+            select,
+            .button {
+                width: 100%;
+            }
+            .category-item {
+                flex: 1 1 100%; /* Prend toute la largeur sur mobile */
+            }
         }
     </style>
 </head>
@@ -121,7 +146,7 @@
             <label for="item-category">Catégorie :</label>
             <select id="item-category" name="item-category" required></select>
 
-            <button type="button" class="add-btn" onclick="addItem()">Ajouter à la liste</button>
+            <button type="button" class="button" onclick="addItem()">Ajouter à la liste</button>
         </form>
     </div>
 
@@ -142,7 +167,7 @@
     <div class="section">
         <h2>Gestion des catégories</h2>
         <input type="text" id="new-category" placeholder="Nom de la nouvelle catégorie">
-        <button type="button" class="add-category-btn" onclick="addCategory()">Ajouter une catégorie</button>
+        <button type="button" class="button" onclick="addCategory()">Ajouter une catégorie</button>
         <ul id="category-list" class="category-list"></ul>
     </div>
 
@@ -151,7 +176,7 @@
         let totalItems = 0;
         let categories = ["Alimentation", "Ménage", "Loisirs", "Autre"];
 
-        // Fonction d'initialisation des catégories
+        // Initialisation des catégories
         function initializeCategories() {
             const categorySelect = document.getElementById('item-category');
             const categoryList = document.getElementById('category-list');
@@ -166,6 +191,7 @@
 
                 // Ajoute l'élément de liste avec bouton retirer
                 const listItem = document.createElement('li');
+                listItem.className = "category-item";
                 listItem.textContent = category;
                 const removeButton = document.createElement('button');
                 removeButton.textContent = "Retirer";
