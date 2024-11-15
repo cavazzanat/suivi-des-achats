@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Achats</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .section {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 8px 0 4px;
+            color: #555;
+            text-align: left;
+            margin-left: auto;
+            margin-right: auto;
+            width: 80%;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 80%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .add-btn, .add-category-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 80%;
+            font-size: 1em;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 10px;
+        }
+        .add-btn:hover, .add-category-btn:hover {
+            background-color: #45a049;
+        }
+        .summary {
+            color: #333;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .shopping-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .shopping-list li {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            margin: 8px 0;
+            background-color: #f3f3f3;
+            border-radius: 4px;
+        }
+        .remove-btn, .remove-category-btn {
+            background-color: #FF6347;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .remove-btn:hover, .remove-category-btn:hover {
+            background-color: #FF4500;
+        }
+        .category-list {
+            list-style-type: none;
+            padding: 0;
+            display: inline-block;
+            text-align: left;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenue sur le Suivi des Achats</h1>
+    <p>Ce site vous permet de suivre vos dépenses et de gérer vos achats de manière efficace. Remplissez le formulaire ci-dessous pour ajouter des articles à votre liste de courses et gérer votre budget.</p>
+
+    <!-- Section Formulaire -->
+    <div class="section">
+        <h2>Formulaire d'ajout d'article</h2>
+        <form id="shopping-form">
+            <label for="item-name">Nom de l'article :</label>
+            <input type="text" id="item-name" name="item-name" placeholder="Exemple : Pain" required>
+
+            <label for="item-price">Prix de l'article (€) :</label>
+            <input type="number" id="item-price" name="item-price" placeholder="Exemple : 2.50" min="0" step="0.01" required>
+
+            <label for="item-category">Catégorie :</label>
+            <select id="item-category" name="item-category" required></select>
+
+            <button type="button" class="add-btn" onclick="addItem()">Ajouter à la liste</button>
+        </form>
+    </div>
+
+    <!-- Section Total -->
+    <div class="section summary">
+        <h2>Récapitulatif des achats</h2>
+        <p><strong>Total des achats :</strong> €<span id="total-price">0.00</span></p>
+        <p><strong>Nombre d'articles :</strong> <span id="total-items">0</span></p>
+    </div>
+
+    <!-- Section Liste des achats -->
+    <div class="section">
+        <h2>Liste des achats</h2>
+        <ul id="shopping-list" class="shopping-list"></ul>
+    </div>
+
+    <!-- Section Gestion des catégories -->
+    <div class="section">
+        <h2>Gestion des catégories</h2>
+        <input type="text" id="new-category" placeholder="Nom de la nouvelle catégorie">
+        <button type="button" class="add-category-btn" onclick="addCategory()">Ajouter une catégorie</button>
+        <ul id="category-list" class="category-list"></ul>
+    </div>
+
+    <script>
+        let totalPrice = 0;
+        let totalItems = 0;
+        let categories = ["Alimentation", "Ménage", "Loisirs", "Autre"];
+
+        // Fonction d'initialisation des catégories
+        function initializeCategories() {
+            const categorySelect = document.getElementById('item-category');
+            const categoryList = document.getElementById('category-list');
+            categorySelect.innerHTML = '';
+            categoryList.innerHTML = '';
+            categories.forEach(category => {
+                // Ajoute l'option au select
+                const option = document.createElement('option');
+                option.value = category.toLowerCase();
+                option.textContent = category;
+                categorySelect.appendChild(option);
+
+                // Ajoute l'élément de liste avec bouton retirer
+                const listItem = document.createElement('li');
+                listItem.textContent = category;
+                const removeButton = document.createElement('button');
+                removeButton.textContent = "Retirer";
+                removeButton.className = "remove-category-btn";
+                removeButton.onclick = function() {
+                    removeCategory(category);
+                };
+                listItem.appendChild(removeButton);
+                categoryList.appendChild(listItem);
+            });
+        }
+
+        function addItem() {
+            const itemName = document.getElementById('item-name').value;
+            const itemPrice = parseFloat(document.getElementById('item-price').value);
+            const itemCategory = document.getElementById('item-category').value;
+
+            const listItem = document.createElement('li');
+            listItem.textContent = `${itemName} - ${itemCategory} : €${itemPrice.toFixed(2)}`;
+
+            const removeButton = document.createElement('button');
+            removeButton.textContent = "Retirer";
+            removeButton.className = "remove-btn";
+            removeButton.onclick = function() {
+                removeItem(listItem, itemPrice);
+            };
+
+            listItem.appendChild(removeButton);
+            document.getElementById('shopping-list').appendChild(listItem);
+
+            totalPrice += itemPrice;
+            totalItems++;
+
+            document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+            document.getElementById('total-items').textContent = totalItems;
+
+            document.getElementById('shopping-form').reset();
+        }
+
+        function removeItem(listItem, itemPrice) {
+            document.getElementById('shopping-list').removeChild(listItem);
+            totalPrice -= itemPrice;
+            totalItems--;
+            document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+            document.getElementById('total-items').textContent = totalItems;
+        }
+
+        function addCategory() {
+            const newCategory = document.getElementById('new-category').value.trim();
+            if (newCategory && !categories.includes(newCategory)) {
+                categories.push(newCategory);
+                initializeCategories();
+                document.getElementById('new-category').value = '';
+            }
+        }
+
+        function removeCategory(category) {
+            categories = categories.filter(cat => cat !== category);
+            initializeCategories();
+        }
+
+        initializeCategories();
+    </script>
+</body>
+</html>
